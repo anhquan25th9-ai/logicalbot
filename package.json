@@ -1,0 +1,13 @@
+{
+  "name": "task2-logic-sparring",
+  "version": "1.0.0",
+  "description": "IELTS Writing Task 2 Logic Sparring iOS App",
+  "private": true,
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}

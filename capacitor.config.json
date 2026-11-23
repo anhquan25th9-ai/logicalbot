@@ -1,0 +1,8 @@
+{
+  "appId": "com.sparring.task2",
+  "appName": "Task2 Sparring",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

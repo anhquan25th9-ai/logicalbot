@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Task2 Sparring" />
+  <title>Task 2 Logic Sparring</title>
+  <style>
+    :root {
+      --bg: #F5F5F7;
+      --surface: #FFFFFF;
+      --surface-2: #EFEFF4;
+      --text: #111113;
+      --text-2: #6E6E73;
+      --border: rgba(0, 0, 0, 0.08);
+      --accent: #007AFF;
+      --accent-soft: rgba(0, 122, 255, 0.12);
+      --danger: #FF3B30;
+      --danger-soft: rgba(255, 59, 48, 0.12);
+      --success: #34C759;
+      --success-soft: rgba(52, 199, 89, 0.12);
+      --warn: #FF9500;
+      --warn-soft: rgba(255, 149, 0, 0.12);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0B0B0F;
+      --surface: #16161A;
+      --surface-2: #222228;
+      --text: #F5F5F7;
+      --text-2: #98989F;
+      --border: rgba(255, 255, 255, 0.09);
+      --accent: #0A84FF;
+      --accent-soft: rgba(10, 132, 255, 0.18);
+      --danger: #FF453A;
+      --danger-soft: rgba(255, 69, 58, 0.16);
+      --success: #30D158;
+      --success-soft: rgba(48, 209, 88, 0.16);
+      --warn: #FF9F0A;
+      --warn-soft: rgba(255, 159, 10, 0.16);
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+      min-height: 100%;
+      overscroll-behavior-y: none;
+    }
+
+    /* Header */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      padding: calc(var(--safe-top) + 12px) 16px 12px;
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-2);
+    }
+
+    .icon-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.12s ease, opacity 0.15s ease;
+    }
+    .icon-btn:active { transform: scale(0.94); }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 16px 16px calc(92px + var(--safe-bottom));
+    }
+
+    .tab-view { display: none; }
+    .tab-view.active { display: block; animation: fadeIn 0.18s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Segmented Control (iOS 18 style) */
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surface-2);
+      padding: 3px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+    .segmented button {
+      border: none;
+      background: transparent;
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .segmented button.active {
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Inputs & Selects */
+    label.field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    input[type="text"], input[type="password"], input[type="url"], select, textarea {
+      width: 100%;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      font-family: inherit;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 96px;
+      line-height: 1.5;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 11px 16px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.15s ease;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #FFFFFF;
+      width: 100%;
+    }
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+    .btn-danger-soft {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+    .btn-sm {
+      padding: 7px 12px;
+      font-size: 13px;
+      border-radius: 9px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Prompt Box */
+    .prompt-display {
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-top: 12px;
+      border-left: 3px solid var(--accent);
+    }
+    .prompt-en {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.55;
+    }
+    .prompt-vi {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border);
+      font-size: 14px;
+      color: var(--text-2);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .badge-accent { background: var(--accent-soft); color: var(--accent); }
+    .badge-danger { background: var(--danger-soft); color: var(--danger); }
+    .badge-success { background: var(--success-soft); color: var(--success); }
+    .badge-warn { background: var(--warn-soft); color: var(--warn); }
+
+    /* Feedback Cards */
+    .fb-card {
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .fb-card.critique { border-left: 4px solid var(--danger); }
+    .fb-card.chain { border-left: 4px solid var(--accent); }
+    .fb-card.rewrite { border-left: 4px solid var(--success); }
+
+    .fb-list {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+    .fb-list li {
+      margin-bottom: 6px;
+    }
+
+    .counter-box {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      background: var(--danger-soft);
+      color: var(--text);
+      font-size: 14px;
+    }
+    .counter-box strong { color: var(--danger); }
+
+    /* 5-step Logic Chain */
+    .chain-step {
+      display: flex;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .chain-step:last-child { border-bottom: none; padding-bottom: 0; }
+    .chain-tag {
+      flex-shrink: 0;
+      min-width: 84px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding-top: 2px;
+    }
+
+    .rewrite-text {
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 13px;
+      font-size: 15px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+
+    /* Sparring Thread */
+    .thread-item {
+      margin-bottom: 12px;
+    }
+    .bubble {
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+    .bubble.user {
+      background: var(--accent);
+      color: #fff;
+      margin-left: 28px;
+      border-bottom-right-radius: 4px;
+    }
+    .bubble.ai {
+      background: var(--surface-2);
+      color: var(--text);
+      margin-right: 28px;
+      border-bottom-left-radius: 4px;
+    }
+    .bubble-meta {
+      font-size: 11px;
+      color: var(--text-2);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    /* Sample & History items */
+    .list-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .list-item-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .list-item-meta {
+      font-size: 12px;
+      color: var(--text-2);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .sample-body {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text);
+      white-space: pre-wrap;
+      background: var(--surface-2);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      margin: 10px 0;
+    }
+
+    /* Bottom Tab Bar (iOS Safe Area) */
+    .tabbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 8px 12px calc(8px + var(--safe-bottom));
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    .tabbar button {
+      border: none;
+      background: transparent;
+      color: var(--text-2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0;
+      border-radius: 10px;
+    }
+    .tabbar button.active {
+      color: var(--accent);
+    }
+    .tabbar .tab-ico {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-sheet {
+      width: 100%;
+      max-width: 520px;
+      background: var(--surface);
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      margin-bottom: var(--safe-bottom);
+    }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: calc(var(--safe-top) + 66px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: var(--text);
+      color: var(--bg);
+      padding: 9px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+      z-index: 200;
+      white-space: nowrap;
+      max-width: 90vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .muted { color: var(--text-2); font-size: 13px; }
+    .hidden { display: none !important; }
+    .mt-8 { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-title">Task 2 Logic Sparring</span>
+      <span class="brand-sub" id="modelBadge">Gemini Pro · Thuần tư duy logic</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="themeToggle" title="Sáng/Tối">◐</button>
+      <button class="icon-btn" id="openSettings" title="Cài đặt API">⚙️</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- TAB 1: SPARRING -->
+    <section id="tab-sparring" class="tab-view active">
+      <div class="card">
+        <div class="segmented" id="promptModeSeg">
+          <button type="button" class="active" data-mode="auto">Tạo đề tự động</button>
+          <button type="button" data-mode="manual">Tự dán đề</button>
+        </div>
+
+        <!-- Auto generate -->
+        <div id="autoPromptPane">
+          <div class="grid-2">
+            <div>
+              <label class="field-label">Chủ đề</label>
+              <select id="topicSelect">
+                <option value="Random IELTS Task 2 topic">Ngẫu nhiên</option>
+                <option value="Education & Science">Giáo dục & Khoa học</option>
+                <option value="Environment & Food Waste">Môi trường & Lãng phí thực phẩm</option>
+                <option value="Technology & AI">Công nghệ & AI</option>
+                <option value="Economy, Poverty & International Aid">Kinh tế, Nghèo đói & Viện trợ</option>
+                <option value="Society, Work & Urbanization">Xã hội, Việc làm & Đô thị hóa</option>
+                <option value="Government Spending & Public Policy">Chính sách công & Ngân sách</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label">Dạng bài</label>
+              <select id="typeSelect">
+                <option value="Opinion (Agree/Disagree)">Opinion (Agree/Disagree)</option>
+                <option value="Discussion (Discuss both views and give your opinion)">Discuss Both Views</option>
+                <option value="Cause and Solution">Cause & Solution</option>
+                <option value="Advantages and Disadvantages">Advantages & Disadvantages</option>
+                <option value="Two-part Question">Two-part Question</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnGenPrompt">Tạo đề Task 2 mới</button>
+        </div>
+
+        <!-- Manual paste -->
+        <div id="manualPromptPane" class="hidden">
+          <label class="field-label">Dán đề IELTS Writing Task 2 của bạn</label>
+          <textarea id="manualPromptInput" placeholder="Dán đề bài tiếng Anh vào đây..."></textarea>
+          <div class="btn-row mt-8">
+            <button class="btn btn-secondary btn-sm" id="btnTranslatePrompt">Dịch nhanh sang tiếng Việt</button>
+            <button class="btn btn-secondary btn-sm" id="btnClearPrompt">Xóa đề</button>
+          </div>
+        </div>
+
+        <!-- Active prompt display -->
+        <div id="activePromptBox" class="prompt-display hidden">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
+            <span class="badge badge-accent" id="activePromptMeta">Đề đang luyện</span>
+            <button class="btn btn-secondary btn-sm" id="btnToggleVi">Ẩn/Hiện dịch</button>
+          </div>
+          <div class="prompt-en" id="activePromptEn"></div>
+          <div class="prompt-vi hidden" id="activePromptVi"></div>
+        </div>
+      </div>
+
+      <!-- Argument Input -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Lập luận của bạn</div>
+        </div>
+
+        <div class="segmented" id="strictnessSeg">
+          <button type="button" class="active" data-strict="band7">Chuẩn Band 7.0</button>
+          <button type="button" data-strict="examiner">Bẻ gắt (Examiner)</button>
+        </div>
+
+        <label class="field-label">Viết ý chính / chuỗi nhân-quả (Tiếng Việt hoặc Tiếng Anh)</label>
+        <textarea id="argumentInput" rows="5" placeholder="Ví dụ: Viện trợ tài chính giúp các nước nghèo xây trường học và bệnh viện, từ đó giảm nghèo bền vững..."></textarea>
+
+        <div class="mt-12">
+          <button class="btn btn-primary" id="btnSpar">Gửi Gemini phản biện &amp; sửa logic</button>
+        </div>
+      </div>
+
+      <!-- Feedback Output -->
+      <div id="feedbackArea" class="hidden">
+        <div class="fb-card critique">
+          <div class="card-header">
+            <div class="card-title">1. Lỗ hổng logic &amp; Đòn bẻ lại</div>
+            <span class="badge badge-danger" id="fbModeBadge">Phản biện</span>
+          </div>
+          <ul class="fb-list" id="fbFlaws"></ul>
+          <div class="counter-box">
+            <strong>Đòn bẻ trực diện:</strong>
+            <div id="fbCounter" class="mt-8"></div>
+          </div>
+        </div>
+
+        <div class="fb-card chain">
+          <div class="card-header">
+            <div class="card-title">2. Chuỗi Nhân – Quả 5 bước có Cơ chế</div>
+            <span class="badge badge-accent">Logic Chain</span>
+          </div>
+          <div id="fbChain"></div>
+        </div>
+
+        <div class="fb-card rewrite">
+          <div class="card-header">
+            <div class="card-title">3. Bản diễn đạt chặt logic (Tiếng Anh)</div>
+            <button class="btn btn-secondary btn-sm" id="btnCopyRewrite">Sao chép</button>
+          </div>
+          <div class="rewrite-text" id="fbRewrite"></div>
+        </div>
+
+        <!-- Multi-turn debate -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Tranh luận tiếp (Bẻ ngược lại AI)</div>
+          </div>
+          <div id="debateThread"></div>
+          <textarea id="followUpInput" rows="3" placeholder="Phản bác lại đòn bẻ của Gemini hoặc bổ sung điều kiện/cơ chế..."></textarea>
+          <div class="btn-row mt-8">
+            <button class="btn btn-primary" id="btnFollowUp">Gửi phản bác</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SAMPLE LIBRARY (YOUPASS EXTRACTOR) -->
+    <section id="tab-samples" class="tab-view">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Cắt bài Sample từ YouPass</div>
+          <span class="badge badge-accent">Tự lọc sạch từ vựng</span>
+        </div>
+
+        <label class="field-label">Cách 1: Dán link bài YouPass (tùy chọn)</label>
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <input type="url" id="youpassUrl" placeholder="https://youpass.vn/..." />
+          <button class="btn btn-secondary" id="btnFetchYoupass" style="flex-shrink:0;">Tải</button>
+        </div>
+
+        <label class="field-label">Cách 2: Dán nội dung copy từ YouPass (ổn định nhất)</label>
+        <textarea id="youpassRaw" rows="5" placeholder="Copy toàn bộ trang bài mẫu trên youpass.vn rồi dán vào đây. AI sẽ tự cắt bỏ quảng cáo, mục từ vựng và chỉ giữ lại Đề bài + Dàn ý logic + Bài mẫu..."></textarea>
+
+        <div class="btn-row mt-12">
+          <button class="btn btn-primary" id="btnExtractYoupass">Cắt &amp; Lưu vào Kho Sample</button>
+        </div>
+
+        <div class="btn-row mt-12" style="justify-content:space-between;">
+          <button class="btn btn-secondary btn-sm" id="btnExportSamples">Xuất .JSON</button>
+          <label class="btn btn-secondary btn-sm" style="margin:0;">
+            Nhập .JSON
+            <input type="file" id="importSamplesInput" accept=".json" class="hidden" />
+          </label>
+        </div>
+      </div>
+
+      <div id="samplesList"></div>
+    </section>
+
+    <!-- TAB 3: HISTORY -->
+    <section id="tab-history" class="tab-view">
+      <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="card-title">Lịch sử phản biện</div>
+          <div class="muted">Lưu cục bộ trên máy, mở lại để tranh luận tiếp</div>
+        </div>
+        <button class="btn btn-danger-soft btn-sm" id="btnClearHistory">Xóa hết</button>
+      </div>
+      <div id="historyList"></div>
+    </section>
+  </main>
+
+  <!-- Bottom Tab Bar -->
+  <nav class="tabbar">
+    <button type="button" class="active" data-tab="sparring">
+      <span class="tab-ico">⚡</span>
+      <span>Phản biện</span>
+    </button>
+    <button type="button" data-tab="samples">
+      <span class="tab-ico">📚</span>
+      <span>Kho Sample</span>
+    </button>
+    <button type="button" data-tab="history">
+      <span class="tab-ico">🕘</span>
+      <span>Lịch sử</span>
+    </button>
+  </nav>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-sheet">
+      <div class="modal-title">
+        <span>Cài đặt Gemini API</span>
+        <button class="icon-btn" id="closeSettings">✕</button>
+      </div>
+
+      <label class="field-label">Gemini API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="AIzaSy..." />
+      <p class="muted mt-8">Key chỉ lưu cục bộ trong trình duyệt / iPhone của bạn.</p>
+
+      <div class="mt-12">
+        <label class="field-label">Model Gemini</label>
+        <select id="modelSelect">
+          <option value="gemini-2.5-pro">gemini-2.5-pro (Phản biện sâu nhất)</option>
+          <option value="gemini-2.5-flash">gemini-2.5-flash (Nhanh, ổn định)</option>
+          <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+        </select>
+      </div>
+
+      <div class="mt-12">
+        <label class="field-label">Hoặc nhập tên model tùy chỉnh (để trống nếu dùng mục trên)</label>
+        <input type="text" id="customModelInput" placeholder="vd: gemini-2.5-pro-preview-..." />
+      </div>
+
+      <div class="mt-12">
+        <button class="btn btn-primary" id="btnSaveSettings">Lưu cài đặt</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ======= STATE & STORAGE =======
+    const STORAGE_KEYS = {
+      API_KEY: 't2_sparring_api_key',
+      MODEL: 't2_sparring_model',
+      CUSTOM_MODEL: 't2_sparring_custom_model',
+      THEME: 't2_sparring_theme',
+      HISTORY: 't2_sparring_history_v2',
+      SAMPLES: 't2_sparring_samples_v2'
+    };
+
+    const DEFAULT_SAMPLES = [
+      {
+        id: 'sample-1',
+        source: 'Mẫu sẵn',
+        type: 'Cause & Solution',
+        topic: 'Environment & Food Waste',
+        prompt: 'In many countries, large amounts of food are wasted every day. What are the causes of this problem, and what measures can be taken to solve it?',
+        logicSummary: 'Body 1 (Causes): Over-purchasing do khuyến mãi siêu thị + tiêu chuẩn ngoại hình nông sản khắt khe khiến thực phẩm còn ăn được bị loại bỏ.\nBody 2 (Solutions): Siêu thị bán giảm giá nông sản lỗi hình thức + chính phủ bắt buộc doanh nghiệp thực phẩm quyên góp phần dư còn hạn dùng.',
+        essay: 'Food waste has become a pressing issue in both developed and developing nations. This problem stems primarily from consumer habits and strict retail standards, yet it can be mitigated through coordinated efforts by supermarkets and governments.\n\nTwo main factors drive large-scale food waste. First, retail promotions such as bulk discounts encourage households to buy more perishable items than they can realistically consume before expiry dates. Because consumers often fail to plan meals around what they already have, surplus groceries are discarded. Second, supermarkets reject vast quantities of fresh produce simply because it fails to meet uniform cosmetic standards in size or shape. Although this food is nutritionally identical to standard produce, it never reaches shelves and is left to rot.\n\nAddressing this issue requires practical interventions at both retail and policy levels. Supermarkets should introduce dedicated sections selling imperfect produce at lower prices, which directly removes the incentive to discard edible crops while attracting budget-conscious shoppers. In addition, governments can pass legislation requiring large food chains to donate unsold but safe food to local charities instead of sending it to landfills, supported by tax deductions to offset logistics costs.\n\nIn conclusion, food waste is largely caused by over-purchasing and rigid aesthetic criteria, and it can be reduced effectively through discounted sales of imperfect produce and mandatory donation policies.'
+      },
+      {
+        id: 'sample-2',
+        source: 'Mẫu sẵn',
+        type: 'Opinion (Agree/Disagree)',
+        topic: 'Economy & International Aid',
+        prompt: 'Some people believe that wealthy countries should provide financial aid to developing nations to reduce poverty, while others think different forms of support are more effective. Discuss both views and give your own opinion.',
+        logicSummary: 'Body 1 (Financial aid): Cứu trợ khẩn cấp nhanh nhưng dễ thất thoát do tham nhũng và tạo tâm lý ỷ lại nếu thiếu giám sát.\nBody 2 (Other support - preferred): Chuyển giao công nghệ, đào tạo nhân lực và mở cửa thương mại công bằng giúp nước nghèo tự tạo nguồn thu bền vững.',
+        essay: 'Whether rich nations should combat global poverty through direct financial aid or alternative forms of assistance remains a subject of debate. While monetary grants are indispensable in emergencies, I believe that structural support such as education and trade access delivers far more durable results.\n\nProponents of financial aid argue that immediate funding allows poorer governments to address urgent deficits in healthcare, sanitation, and disaster relief. Without external capital, low-income countries often lack the fiscal capacity to prevent humanitarian crises. However, direct cash transfers carry serious limitations: when local governance is weak, funds are frequently misallocated, and long-term reliance on foreign budgets can discourage domestic fiscal reform.\n\nBy contrast, non-financial support tackles the root causes of poverty by building local capacity. Investing in vocational training, agricultural technology, and infrastructure enables developing economies to increase productivity and retain skilled workers. Equally important, removing unfair trade barriers allows businesses in poorer countries to compete in international markets and generate independent revenue rather than depending on periodic donations.\n\nIn conclusion, although financial aid plays a vital short-term role during crises, capacity-building initiatives and fair trade policies offer a more reliable pathway out of poverty.'
+      },
+      {
+        id: 'sample-3',
+        source: 'Mẫu sẵn',
+        type: 'Cause & Effect',
+        topic: 'Education & Science',
+        prompt: 'In many countries, fewer students are choosing to study science subjects at university. What are the reasons for this trend, and what effects might it have on society?',
+        logicSummary: 'Body 1 (Reasons): Chương trình khoa học tự nhiên nặng lý thuyết, khó đạt điểm cao trong khi các ngành kinh tế/công nghệ ứng dụng có lộ trình thu nhập sớm và rõ ràng hơn.\nBody 2 (Effects): Thiếu hụt nhân lực nghiên cứu cốt lõi (y tế, năng lượng, khí hậu), làm chậm năng lực đổi mới dài hạn của quốc gia.',
+        essay: 'A declining number of university students are opting for natural science degrees in many parts of the world. This shift is largely driven by perceived academic difficulty and career incentives, and it poses serious long-term risks to technological and social progress.\n\nThe drop in science enrollment can be traced to two practical concerns among students. First, subjects such as physics and chemistry demand heavy theoretical study and laboratory work, making high grades harder to secure than in some humanities or business fields. Second, career prospects in pure science often require postgraduate qualifications before offering competitive salaries, whereas graduates in finance or software can enter high-paying roles immediately after completing an undergraduate degree.\n\nIf this trend continues, societies will face a shortage of specialists capable of solving complex structural problems. Fields such as medical research, renewable energy, and climate adaptation rely directly on scientists who can develop foundational breakthroughs rather than merely applying existing tools. Over time, countries with shrinking scientific talent pools may become dependent on foreign innovation and lose economic competitiveness.\n\nIn conclusion, demanding coursework and delayed financial returns explain why students avoid science degrees, and this decline threatens a nation’s capacity for long-term innovation.'
+      }
+    ];
+
+    let state = {
+      promptMode: 'auto', // auto | manual
+      strictness: 'band7', // band7 | examiner
+      currentPromptEn: '',
+      currentPromptVi: '',
+      currentTopic: '',
+      currentType: '',
+      currentSessionId: null,
+      lastFeedback: null,
+      thread: [] // {role: 'user'|'ai', text: '...'}
+    };
+
+    // ======= DOM HELPERS =======
+    const $ = (id) => document.getElementById(id);
+
+    function showToast(msg) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ======= THEME =======
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem(STORAGE_KEYS.THEME, theme);
+    }
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME) ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
+
+    $('themeToggle').addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+
+    // ======= SETTINGS =======
+    function getApiKey() {
+      return (localStorage.getItem(STORAGE_KEYS.API_KEY) || '').trim();
+    }
+    function getModel() {
+      const custom = (localStorage.getItem(STORAGE_KEYS.CUSTOM_MODEL) || '').trim();
+      if (custom) return custom;
+      return localStorage.getItem(STORAGE_KEYS.MODEL) || 'gemini-2.5-pro';
+    }
+    function updateModelBadge() {
+      $('modelBadge').textContent = `${getModel()} · Thuần tư duy logic`;
+    }
+    updateModelBadge();
+
+    $('openSettings').addEventListener('click', () => {
+      $('apiKeyInput').value = getApiKey();
+      $('modelSelect').value = localStorage.getItem(STORAGE_KEYS.MODEL) || 'gemini-2.5-pro';
+      $('customModelInput').value = localStorage.getItem(STORAGE_KEYS.CUSTOM_MODEL) || '';
+      $('settingsModal').classList.add('open');
+    });
+    $('closeSettings').addEventListener('click', () => $('settingsModal').classList.remove('open'));
+    $('settingsModal').addEventListener('click', (e) => {
+      if (e.target === $('settingsModal')) $('settingsModal').classList.remove('open');
+    });
+    $('btnSaveSettings').addEventListener('click', () => {
+      localStorage.setItem(STORAGE_KEYS.API_KEY, $('apiKeyInput').value.trim());
+      localStorage.setItem(STORAGE_KEYS.MODEL, $('modelSelect').value);
+      localStorage.setItem(STORAGE_KEYS.CUSTOM_MODEL, $('customModelInput').value.trim());
+      updateModelBadge();
+      $('settingsModal').classList.remove('open');
+      showToast('Đã lưu cài đặt Gemini');
+    });
+
+    // ======= GEMINI API CALL =======
+    async function callGemini(promptText, expectJson = false) {
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        $('settingsModal').classList.add('open');
+        throw new Error('Vui lòng nhập Gemini API Key trước');
+      }
+      const model = getModel();
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+      const body = {
+        contents: [{ role: 'user', parts: [{ text: promptText }] }],
+        generationConfig: {
+          temperature: expectJson ? 0.45 : 0.65
+        }
+      };
+      if (expectJson) {
+        body.generationConfig.responseMimeType = 'application/json';
+      }
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error?.message || `Lỗi API (${res.status})`);
+      }
+
+      const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+      if (!text) throw new Error('Gemini không trả về nội dung');
+
+      if (expectJson) {
+        const cleaned = text.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+        return JSON.parse(cleaned);
+      }
+      return text.trim();
+    }
+
+    function setLoading(btn, loading, label) {
+      if (loading) {
+        btn.dataset.oldText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner"></span> ${label}`;
+      } else {
+        btn.disabled = false;
+        btn.innerHTML = btn.dataset.oldText || label;
+      }
+    }
+
+    // ======= TABS =======
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.tabbar button').forEach(b => b.classList.remove('active'));
+      $(`tab-${tabName}`).classList.add('active');
+      document.querySelector(`.tabbar button[data-tab="${tabName}"]`).classList.add('active');
+      if (tabName === 'samples') renderSamples();
+      if (tabName === 'history') renderHistory();
+    }
+    document.querySelectorAll('.tabbar button').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // ======= PROMPT MODE & STRICTNESS =======
+    document.querySelectorAll('#promptModeSeg button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#promptModeSeg button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.promptMode = btn.dataset.mode;
+        $('autoPromptPane').classList.toggle('hidden', state.promptMode !== 'auto');
+        $('manualPromptPane').classList.toggle('hidden', state.promptMode !== 'manual');
+      });
+    });
+
+    document.querySelectorAll('#strictnessSeg button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#strictnessSeg button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.strictness = btn.dataset.strict;
+      });
+    });
+
+    function showActivePrompt(en, vi, meta) {
+      state.currentPromptEn = en;
+      state.currentPromptVi = vi || '';
+      $('activePromptEn').textContent = en;
+      $('activePromptVi').textContent = vi || 'Chưa có bản dịch tiếng Việt.';
+      $('activePromptMeta').textContent = meta || 'Đề đang luyện';
+      $('activePromptBox').classList.toggle('hidden', !en);
+    }
+
+    $('btnToggleVi').addEventListener('click', () => {
+      $('activePromptVi').classList.toggle('hidden');
+    });
+
+    $('manualPromptInput').addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      state.currentPromptEn = val;
+      if (val) {
+        showActivePrompt(val, state.currentPromptVi, 'Đề tự dán');
+      } else {
+        $('activePromptBox').classList.add('hidden');
+      }
+    });
+
+    $('btnClearPrompt').addEventListener('click', () => {
+      $('manualPromptInput').value = '';
+      state.currentPromptEn = '';
+      state.currentPromptVi = '';
+      $('activePromptBox').classList.add('hidden');
+    });
+
+    $('btnTranslatePrompt').addEventListener('click', async () => {
+      const raw = $('manualPromptInput').value.trim();
+      if (!raw) return showToast('Hãy dán đề tiếng Anh trước');
+      const btn = $('btnTranslatePrompt');
+      setLoading(btn, true, 'Đang dịch...');
+      try {
+        const vi = await callGemini(`Dịch chính xác, sát nghĩa đề IELTS Writing Task 2 sau sang tiếng Việt. Chỉ trả về đoạn dịch, không giải thích thêm:\n\n${raw}`, false);
+        showActivePrompt(raw, vi, 'Đề tự dán');
+        $('activePromptVi').classList.remove('hidden');
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        setLoading(btn, false, 'Dịch nhanh sang tiếng Việt');
+      }
+    });
+
+    $('btnGenPrompt').addEventListener('click', async () => {
+      const topic = $('topicSelect').value;
+      const type = $('typeSelect').value;
+      const btn = $('btnGenPrompt');
+      setLoading(btn, true, 'Đang tạo đề...');
+      try {
+        const prompt = `Bạn là giám khảo IELTS Writing. Hãy tạo 1 đề IELTS Writing Task 2 thật sát đề thi thật.
+Chủ đề: ${topic}
+Dạng bài: ${type}
+KHÔNG kèm từ vựng, KHÔNG kèm gợi ý bài mẫu.
+Trả về JSON theo đúng cấu trúc:
+{
+  "prompt_en": "Đề tiếng Anh chuẩn IELTS Task 2",
+  "prompt_vi": "Bản dịch tiếng Việt tự nhiên, sát nghĩa",
+  "topic": "Tên chủ đề ngắn",
+  "type": "Dạng bài"
+}`;
+        const res = await callGemini(prompt, true);
+        state.currentTopic = res.topic || topic;
+        state.currentType = res.type || type;
+        showActivePrompt(res.prompt_en, res.prompt_vi, `${state.currentType} · ${state.currentTopic}`);
+        $('activePromptVi').classList.add('hidden');
+        // Reset session
+        state.currentSessionId = null;
+        state.thread = [];
+        $('feedbackArea').classList.add('hidden');
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        setLoading(btn, false, 'Tạo đề Task 2 mới');
+      }
+    });
+
+    // ======= LOGIC SPARRING =======
+    $('btnSpar').addEventListener('click', async () => {
+      const promptEn = state.promptMode === 'manual'
+        ? ($('manualPromptInput').value.trim() || state.currentPromptEn)
+        : state.currentPromptEn;
+
+      const userArg = $('argumentInput').value.trim();
+      if (!promptEn) return showToast('Hãy tạo đề hoặc dán đề trước');
+      if (!userArg) return showToast('Hãy nhập lập luận của bạn');
+
+      const btn = $('btnSpar');
+      setLoading(btn, true, 'Gemini đang bẻ logic...');
+
+      const strictPrompt = state.strictness === 'examiner'
+        ? 'Chế độ BẺ GẮT (Examiner): Soi thật kỹ các lỗi nhảy cóc logic (logical leap), khái quát hóa quá mức (overgeneralization), lập luận vòng tròn, thiếu cơ chế trung gian hoặc lệch câu hỏi. Phản biện sắc bén, thẳng thắn.'
+        : 'Chế độ CHUẨN BAND 7.0: Chỉ ra rõ lỗ hổng lập luận khiến điểm Task Response / Coherence bị kẹt dưới 7.0, sau đó sửa lại theo mạch nhân-quả rõ ràng, tự nhiên, không hàn lâm quá mức.';
+
+      const instruction = `Bạn là huấn luyện viên tư duy phản biện cho IELTS Writing Task 2.
+QUY TẮC TUYỆT ĐỐI:
+- TUYỆT ĐỐI KHÔNG nhắc đến từ vựng, KHÔNG giải thích Lexical Resource, KHÔNG highlight collocation, KHÔNG liệt kê từ mới.
+- Tập trung 100% vào tư duy logic, tính thuyết phục, độ liên kết nhân-quả và việc trả lời đúng trọng tâm đề bài.
+- ${strictPrompt}
+
+Đề bài IELTS Task 2:
+"${promptEn}"
+
+Lập luận của người học:
+"${userArg}"
+
+Trả về JSON theo đúng cấu trúc sau:
+{
+  "flaws": ["Lỗ hổng logic 1 (tiếng Việt, ngắn gọn, đi thẳng vấn đề)", "Lỗ hổng logic 2", "Lỗ hổng logic 3 (nếu có)"],
+  "counter_attack": "Một đòn bẻ ngược trực diện bằng tiếng Việt như đối thủ tranh biện / giám khảo đang chất vấn lập luận của người học.",
+  "logic_chain": {
+    "claim": "Luận điểm chính rõ ràng, không cực đoan (tiếng Việt)",
+    "cause": "Nguyên nhân gốc (tiếng Việt)",
+    "mechanism": "Cơ chế trung gian giải thích TẠI SAO nguyên nhân dẫn tới hệ quả (tiếng Việt)",
+    "effect": "Hệ quả trực tiếp bám sát đề bài (tiếng Việt)",
+    "example": "Ví dụ cụ thể, thực tế chứng minh cơ chế trên (tiếng Việt)"
+  },
+  "english_paragraph": "Đoạn văn body paragraph hoàn chỉnh bằng tiếng Anh (khoảng 90-120 từ) triển khai đúng chuỗi logic 5 bước ở trên. Văn phong tự nhiên, mạch lạc chuẩn Band 7.0, thuần túy tập trung vào độ chặt chẽ của lập luận."
+}`;
+
+      try {
+        const res = await callGemini(instruction, true);
+        state.currentPromptEn = promptEn;
+        state.lastFeedback = res;
+        state.thread = [];
+        renderFeedback(res);
+        saveCurrentSession(userArg);
+        $('feedbackArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        setLoading(btn, false, 'Gửi Gemini phản biện & sửa logic');
+      }
+    });
+
+    function renderFeedback(fb) {
+      $('feedbackArea').classList.remove('hidden');
+      $('fbModeBadge').textContent = state.strictness === 'examiner' ? 'Bẻ gắt (Examiner)' : 'Chuẩn Band 7.0';
+
+      $('fbFlaws').innerHTML = (fb.flaws || []).map(f => `<li>${escapeHtml(f)}</li>`).join('');
+      $('fbCounter').textContent = fb.counter_attack || '';
+
+      const c = fb.logic_chain || {};
+      const steps = [
+        ['1. Claim', c.claim],
+        ['2. Cause', c.cause],
+        ['3. Mechanism', c.mechanism],
+        ['4. Effect', c.effect],
+        ['5. Example', c.example]
+      ];
+      $('fbChain').innerHTML = steps.map(([label, val]) => `
+        <div class="chain-step">
+          <div class="chain-tag">${label}</div>
+          <div>${escapeHtml(val || '')}</div>
+        </div>
+      `).join('');
+
+      $('fbRewrite').textContent = fb.english_paragraph || '';
+      renderThread();
+    }
+
+    $('btnCopyRewrite').addEventListener('click', async () => {
+      const txt = $('fbRewrite').textContent;
+      if (!txt) return;
+      try {
+        await navigator.clipboard.writeText(txt);
+        showToast('Đã sao chép đoạn tiếng Anh');
+      } catch {
+        showToast('Không thể sao chép tự động');
+      }
+    });
+
+    // ======= MULTI-TURN DEBATE =======
+    function renderThread() {
+      $('debateThread').innerHTML = state.thread.map(item => `
+        <div class="thread-item">
+          <div class="bubble-meta">${item.role === 'user' ? 'Bạn phản bác' : 'Gemini phản biện'}</div>
+          <div class="bubble ${item.role}">${escapeHtml(item.text)}</div>
+        </div>
+      `).join('');
+    }
+
+    $('btnFollowUp').addEventListener('click', async () => {
+      const msg = $('followUpInput').value.trim();
+      if (!msg) return showToast('Hãy nhập nội dung phản bác');
+      if (!state.lastFeedback) return;
+
+      const btn = $('btnFollowUp');
+      setLoading(btn, true, 'Đang phản hồi...');
+
+      const historyText = state.thread.map(t => `${t.role === 'user' ? 'Người học' : 'Gemini'}: ${t.text}`).join('\n');
+      const prompt = `Bạn đang tranh biện logic IELTS Writing Task 2 với người học.
+QUY TẮC: Không nhắc tới từ vựng hay ngữ pháp, chỉ đánh giá độ chặt chẽ của lập luận.
+Đề bài: "${state.currentPromptEn}"
+Đòn bẻ trước đó của bạn: "${state.lastFeedback.counter_attack}"
+Diễn biến tranh luận trước đó:
+${historyText || '(Chưa có)'}
+
+Phản bác mới của người học:
+"${msg}"
+
+Hãy phản hồi bằng tiếng Việt (ngắn gọn 3-5 câu):
+1. Nếu người học đã vá được lỗ hổng logic, công nhận rõ ràng điểm họ vừa vá được và gợi ý cách chốt luận điểm.
+2. Nếu vẫn còn sơ hở, tiếp tục bẻ thẳng vào điểm yếu mới đó.`;
+
+      try {
+        const reply = await callGemini(prompt, false);
+        state.thread.push({ role: 'user', text: msg });
+        state.thread.push({ role: 'ai', text: reply });
+        $('followUpInput').value = '';
+        renderThread();
+        updateSessionThread();
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        setLoading(btn, false, 'Gửi phản bác');
+      }
+    });
+
+    // ======= HISTORY STORAGE =======
+    function loadHistory() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]'); }
+      catch { return []; }
+    }
+    function saveHistory(list) {
+      localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(list));
+    }
+
+    function saveCurrentSession(userArg) {
+      const list = loadHistory();
+      const id = 'sess-' + Date.now();
+      state.currentSessionId = id;
+      list.unshift({
+        id,
+        date: new Date().toLocaleString('vi-VN'),
+        promptEn: state.currentPromptEn,
+        promptVi: state.currentPromptVi,
+        strictness: state.strictness,
+        argument: userArg,
+        feedback: state.lastFeedback,
+        thread: state.thread
+      });
+      saveHistory(list.slice(0, 50));
+    }
+
+    function updateSessionThread() {
+      if (!state.currentSessionId) return;
+      const list = loadHistory();
+      const idx = list.findIndex(x => x.id === state.currentSessionId);
+      if (idx !== -1) {
+        list[idx].thread = state.thread;
+        saveHistory(list);
+      }
+    }
+
+    function renderHistory() {
+      const list = loadHistory();
+      const container = $('historyList');
+      if (!list.length) {
+        container.innerHTML = `<div class="card muted" style="text-align:center;">Chưa có phiên phản biện nào được lưu.</div>`;
+        return;
+      }
+      container.innerHTML = list.map(item => `
+        <div class="list-item">
+          <div class="list-item-meta">
+            <span class="badge ${item.strictness === 'examiner' ? 'badge-danger' : 'badge-accent'}">${item.strictness === 'examiner' ? 'Bẻ gắt' : 'Band 7.0'}</span>
+            <span>${escapeHtml(item.date)}</span>
+            ${item.thread?.length ? `<span>· ${item.thread.length / 2} lượt tranh luận</span>` : ''}
+          </div>
+          <div class="list-item-title">${escapeHtml(item.promptEn)}</div>
+          <div class="muted" style="margin-bottom:10px;"><strong>Lập luận:</strong> ${escapeHtml(item.argument.slice(0, 140))}${item.argument.length > 140 ? '...' : ''}</div>
+          <div class="btn-row">
+            <button class="btn btn-secondary btn-sm" onclick="openHistorySession('${item.id}')">Mở lại &amp; Tranh luận tiếp</button>
+            <button class="btn btn-danger-soft btn-sm" onclick="deleteHistorySession('${item.id}')">Xóa</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.openHistorySession = function(id) {
+      const item = loadHistory().find(x => x.id === id);
+      if (!item) return;
+      state.currentSessionId = item.id;
+      state.currentPromptEn = item.promptEn;
+      state.currentPromptVi = item.promptVi || '';
+      state.strictness = item.strictness || 'band7';
+      state.lastFeedback = item.feedback;
+      state.thread = item.thread || [];
+
+      // Switch to manual mode so prompt is editable/visible
+      document.querySelectorAll('#promptModeSeg button').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === 'manual');
+      });
+      state.promptMode = 'manual';
+      $('autoPromptPane').classList.add('hidden');
+      $('manualPromptPane').classList.remove('hidden');
+      $('manualPromptInput').value = item.promptEn;
+      showActivePrompt(item.promptEn, item.promptVi, 'Phiên từ lịch sử');
+
+      document.querySelectorAll('#strictnessSeg button').forEach(b => {
+        b.classList.toggle('active', b.dataset.strict === state.strictness);
+      });
+      $('argumentInput').value = item.argument;
+      renderFeedback(item.feedback);
+      switchTab('sparring');
+      showToast('Đã khôi phục phiên luyện tập');
+    };
+
+    window.deleteHistorySession = function(id) {
+      const list = loadHistory().filter(x => x.id !== id);
+      saveHistory(list);
+      renderHistory();
+      showToast('Đã xóa phiên');
+    };
+
+    $('btnClearHistory').addEventListener('click', () => {
+      if (!confirm('Xóa toàn bộ lịch sử phản biện?')) return;
+      saveHistory([]);
+      renderHistory();
+      showToast('Đã xóa toàn bộ lịch sử');
+    });
+
+    // ======= SAMPLES & YOUPASS EXTRACTOR =======
+    function loadSamples() {
+      const raw = localStorage.getItem(STORAGE_KEYS.SAMPLES);
+      if (!raw) {
+        localStorage.setItem(STORAGE_KEYS.SAMPLES, JSON.stringify(DEFAULT_SAMPLES));
+        return DEFAULT_SAMPLES;
+      }
+      try { return JSON.parse(raw); }
+      catch { return DEFAULT_SAMPLES; }
+    }
+    function saveSamples(list) {
+      localStorage.setItem(STORAGE_KEYS.SAMPLES, JSON.stringify(list));
+    }
+
+    $('btnFetchYoupass').addEventListener('click', async () => {
+      const url = $('youpassUrl').value.trim();
+      if (!url) return showToast('Hãy dán link YouPass');
+      const btn = $('btnFetchYoupass');
+      setLoading(btn, true, '...');
+      try {
+        // Attempt CORS-friendly reader proxy
+        const proxyUrl = `https://r.jina.ai/${url}`;
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error('Web chặn tải tự động');
+        const text = await res.text();
+        if (!text || text.length < 100) throw new Error('Không lấy được nội dung');
+        $('youpassRaw').value = text.slice(0, 18000);
+        showToast('Đã tải nội dung! Bấm Cắt & Lưu');
+      } catch (err) {
+        showToast('Không tải trực tiếp được link này, hãy copy dán vào ô bên dưới');
+      } finally {
+        setLoading(btn, false, 'Tải');
+      }
+    });
+
+    $('btnExtractYoupass').addEventListener('click', async () => {
+      const raw = $('youpassRaw').value.trim();
+      if (!raw) return showToast('Hãy dán nội dung bài mẫu YouPass trước');
+
+      const btn = $('btnExtractYoupass');
+      setLoading(btn, true, 'Đang cắt sạch bài mẫu...');
+
+      const instruction = `Bạn là bộ lọc dữ liệu IELTS Writing Task 2. Người dùng vừa copy nội dung thô từ trang web youpass.vn.
+NHIỆM VỤ:
+1. Lọc bỏ hoàn toàn menu, quảng cáo, kêu gọi đăng ký khóa học, bình luận.
+2. LOẠI BỎ HOÀN TOÀN tất cả các mục từ vựng, bảng giải thích từ mới, collocation, paraphrase list.
+3. Chỉ giữ lại Đề bài tiếng Anh, Dạng bài, Chủ đề, Tóm tắt mạch logic (Body 1 & Body 2 bằng tiếng Việt ngắn gọn), và Bài văn mẫu tiếng Anh hoàn chỉnh (thuần text).
+
+Trả về JSON theo đúng cấu trúc:
+{
+  "prompt": "Đề IELTS Task 2 tiếng Anh đầy đủ",
+  "type": "Dạng bài (Opinion / Discussion / Cause & Solution / ...)",
+  "topic": "Chủ đề ngắn gọn",
+  "logicSummary": "Body 1: ...\\nBody 2: ... (tóm tắt mạch lập luận chính bằng tiếng Việt)",
+  "essay": "Toàn văn bài mẫu tiếng Anh, giữ nguyên phân đoạn bằng \\n\\n"
+}
+
+Nội dung thô từ YouPass:
+"""
+${raw.slice(0, 16000)}
+"""`;
+
+      try {
+        const res = await callGemini(instruction, true);
+        const list = loadSamples();
+        list.unshift({
+          id: 'sample-' + Date.now(),
+          source: 'YouPass',
+          prompt: res.prompt || 'Không rõ đề bài',
+          type: res.type || 'Task 2',
+          topic: res.topic || 'General',
+          logicSummary: res.logicSummary || '',
+          essay: res.essay || ''
+        });
+        saveSamples(list);
+        $('youpassRaw').value = '';
+        $('youpassUrl').value = '';
+        renderSamples();
+        showToast('Đã cắt và lưu bài sample!');
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        setLoading(btn, false, 'Cắt & Lưu vào Kho Sample');
+      }
+    });
+
+    function renderSamples() {
+      const list = loadSamples();
+      $('samplesList').innerHTML = list.map(s => `
+        <div class="list-item">
+          <div class="list-item-meta">
+            <span class="badge badge-accent">${escapeHtml(s.type)}</span>
+            <span class="badge badge-success">${escapeHtml(s.source || 'Sample')}</span>
+            <span>${escapeHtml(s.topic)}</span>
+          </div>
+          <div class="list-item-title">${escapeHtml(s.prompt)}</div>
+          ${s.logicSummary ? `<div class="muted" style="white-space:pre-wrap; margin-bottom:8px;"><strong>Mạch logic:</strong>\n${escapeHtml(s.logicSummary)}</div>` : ''}
+          <details>
+            <summary style="cursor:pointer; font-size:13px; font-weight:600; color:var(--accent); margin-bottom:8px;">Xem bài mẫu hoàn chỉnh</summary>
+            <div class="sample-body">${escapeHtml(s.essay)}</div>
+          </details>
+          <div class="btn-row mt-8">
+            <button class="btn btn-primary btn-sm" style="width:auto;" onclick="practiceSample('${s.id}')">Luyện phản biện đề này</button>
+            <button class="btn btn-danger-soft btn-sm" onclick="deleteSample('${s.id}')">Xóa</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.practiceSample = function(id) {
+      const s = loadSamples().find(x => x.id === id);
+      if (!s) return;
+      document.querySelectorAll('#promptModeSeg button').forEach(b => {
+        b.classList.toggle('active', b.dataset.mode === 'manual');
+      });
+      state.promptMode = 'manual';
+      $('autoPromptPane').classList.add('hidden');
+      $('manualPromptPane').classList.remove('hidden');
+      $('manualPromptInput').value = s.prompt;
+      showActivePrompt(s.prompt, '', `Sample · ${s.type}`);
+      $('feedbackArea').classList.add('hidden');
+      $('argumentInput').value = '';
+      switchTab('sparring');
+      showToast('Đã đưa đề vào mục Phản biện');
+    };
+
+    window.deleteSample = function(id) {
+      const list = loadSamples().filter(x => x.id !== id);
+      saveSamples(list);
+      renderSamples();
+      showToast('Đã xóa bài sample');
+    };
+
+    $('btnExportSamples').addEventListener('click', () => {
+      const data = JSON.stringify(loadSamples(), null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'task2-samples.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Đã xuất file JSON');
+    });
+
+    $('importSamplesInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const imported = JSON.parse(reader.result);
+          if (!Array.isArray(imported)) throw new Error('File không đúng định dạng');
+          const merged = [...imported, ...loadSamples()];
+          saveSamples(merged);
+          renderSamples();
+          showToast(`Đã nhập ${imported.length} bài sample`);
+        } catch (err) {
+          showToast('Lỗi đọc file JSON');
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+
+    // Init
+    renderSamples();
+  </script>
+</body>
+</html>
